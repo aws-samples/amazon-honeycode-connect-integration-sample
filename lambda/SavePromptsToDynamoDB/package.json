@@ -1,0 +1,20 @@
+{
+  "name": "promptstodynamodb",
+  "version": "1.0.0",
+  "description": "Moves prompts from Honeycode to Dynamo DB",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TBD"
+  },
+  "author": "dtet@amazon.com",
+  "license": "MIT",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.2.0",
+    "aws-sdk": "^2.840.0",
+    "csv-stringify": "^5.6.1"
+  }
+}

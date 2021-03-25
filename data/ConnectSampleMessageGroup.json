@@ -1,0 +1,47 @@
+{
+  "Messages": {
+    "Situational": [
+      {
+        "Enabled": true,
+        "MsgDetail": {
+          "MsgId": "EmergencyMessage",
+          "MsgText": {
+            "en-US": "<speak>Due to storms in the north east, services in several states have been affected. We are working to restore at the earliest.</speak>",
+            "es-US": "<speak>Debido a las tormentas en el noreste, los servicios en varios estados se han visto afectados. Estamos trabajando para restaurar lo antes posible.</speak>"
+          }
+        }
+      }
+    ],
+    "Static": [
+      {
+        "MsgId": "TechDifficultiesErrorMessage",
+        "MsgText": {
+          "en-US": "<speak>We are currently experiencing technical difficulties, please try again later.</speak>",
+          "es-US": "<speak>Actualmente estamos experimentando dificultades en el sistema. Por favor devuelva la llamada en otro momento.</speak>"
+        }
+      },
+      {
+        "MsgId": "GreetingMessage",
+        "MsgText": {
+          "en-US": "<speak><prosody pitch='x-high' volume='+6dB'>Hello!</prosody><break time='.3s'/> <amazon:breath volume='x-soft' duration='x-short'/><prosody pitch='+25%' rate='-2%'>You have reached the intelligent voice experience brought to you by Amazon Connect.</prosody>\n \n</speak>",
+          "es-US": "<speak><prosody pitch='x-high' volume='+6dB'>Ola!</prosody><break time='.3s'/> <amazon:breath volume='x-soft' duration='x-short'/><prosody pitch='+25%' rate='-2%'>Has alcanzado la experiencia de voz inteligente que te ofrece Amazon Connect.</prosody>\n \n</speak>"
+        }
+      },
+      {
+        "MsgId": "LanguageSelectionPrompt",
+        "MsgText": {
+          "en-US": "<speak>Para continuar en español, oprima nueve.</speak>",
+          "es-US": "<speak>To continue in English, press 9.</speak>"
+        }
+      },
+      {
+        "MsgId": "SampleTransitionMessage",
+        "MsgText": {
+          "en-US": "<speak>The rest of the experience will continue in the language you selected. Good Bye.</speak>",
+          "es-US": "<speak>El resto de la experiencia continuará en el idioma que seleccionó. Adios.</speak>"
+        }
+      }
+    ]
+  },
+  "MsgGroup": "1000_GreetingLanguage"
+}
