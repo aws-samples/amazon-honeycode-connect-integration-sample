@@ -25,7 +25,7 @@ In this demonstation lab, we provide all the Lambda code, DynamoDB tables,
 Amazon Connect flows you will need. You will also need a Honeycode template
 and modify the code slightly to use the newly instantiated template.
 
-For step by step instructions please see the [Docs](Docs) directory.
+For step by step instructions please see the [Docs](docs) directory.
 
 Special credit to Milos Cosic who provided the Amazon Connect to DynamoDB
 integration [here](https://aws.amazon.com/blogs/contact-center/build-multilingual-voice-experiences-in-amazon-connect/).
