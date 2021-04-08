@@ -1,0 +1,23 @@
+{
+  "name": "honeycode_connect_lab",
+  "version": "0.1.0",
+  "bin": {
+    "honeycode_connect_lab": "bin/honeycode_connect_lab.js"
+  },
+  "scripts": {
+    "build": "echo \"The build step is not required when using JavaScript!\" && exit 0",
+    "cdk": "cdk",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@aws-cdk/assert": "1.84.0",
+    "aws-cdk": "1.84.0",
+    "jest": "^26.4.2"
+  },
+  "dependencies": {
+    "@aws-cdk/aws-dynamodb": "^1.85.0",
+    "@aws-cdk/aws-events-targets": "^1.85.0",
+    "@aws-cdk/aws-lambda": "^1.85.0",
+    "@aws-cdk/core": "1.84.0"
+  }
+}
