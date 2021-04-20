@@ -31,7 +31,7 @@
         "MsgId": "LanguageSelectionPrompt",
         "MsgText": {
           "en-US": "<speak>Para continuar en español, oprima nueve.</speak>",
-          "es-US": "<speak>To continue in English, press 9.</speak>"
+          "es-US": "<speak>To continue in English, press 1.</speak>"
         }
       },
       {

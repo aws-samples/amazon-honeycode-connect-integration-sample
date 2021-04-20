@@ -1,68 +1,75 @@
 # Amazon Connect + Amazon Honeycode Integration sample
 
-Before we dive into the step by step lab, here is the architecture of the solution.
+Before we dive into the step-by-step lab, here is the architecture of the solution.
 ![Architecture Diagram](media/architecture-diagram.png)
 
-## 0. Overivew and Prerequisites 
+## Overview and Prerequisites
 This lab should take about 30-60 minutes. The expertise level is: Medium. You will
-not have to code, but will need to be able to execute commands on the command line, 
-change text files, navigate the AWS console. 
+not have to code, but will need to be able to execute commands on the command line,
+change text files, navigate the AWS console.
 
 Prerequisites for this lab:
-- Amazon Honeycode - where you will instantiate and use a template.
+- Amazon Honeycode account - If you don’t have one already, [create a new Honeycode account](https://www.honeycode.aws) and login to your Honeycode account. To get started with Honeycode API you need to [link your Honeycode team with your AWS Account](https://honeycodecommunity.aws/t/connecting-honeycode-to-an-aws-account/98)
 - Amazon Connect - where you will import a new Contact flow and claim a phone number
   to test the integration.
 - AWS Cloud9 IDE - where you will download this repository and execute a few CDK
-  commands. These commands will automatically setup all the necessary Lambda 
+  commands. These commands will automatically setup all the necessary Lambda
   functions, DynamoDB table, and permissions.
-- AWS Console - where you will be looking at DynamoDB tables, set permissions for 
+- AWS Console - where you will be looking at DynamoDB tables, set permissions for
   Connect to access Lambda functions.
 - Permissions - you will need Developer level permissions, specifically to setup
   the above services.
 
 Cost of this lab:
-- This lab will cost a few cents to run. The costs will be in AWS Lambda function 
+- This lab will cost a few cents to run. The costs will be in AWS Lambda function
   executions, and several calls (charged by the minute) to the Amazon Connect.
-- To avoid un-expected charges, please destroy this lab when you are done, and do not 
+- To avoid un-expected charges, please destroy this lab when you are done, and do not
   give access or the phone number (used in this lab) to anybody else.
 
-## 1. Instantiate Amazon Honeycode Tempalte 
+## Instantiate Amazon Honeycode Template
 
-## 2. Deploy the accompanying code
+1. Create a new Workbook using the Connect Manager template
 
-create Cloud9 instance (URL)
-wget https://github.com/aws-samples/amazon-honeycode-connect-integration-sample/archive/refs/heads/main.zip
-unzip main.zip
-rm main.zip 
-cd amazon-honeycode-connect-integration-sample-main
+![Connect Manager Template](media/create-workbook-from-template.gif)
+2. Open Builder > **Call Center Manager** app, right click on any screen, click on **Get ARN and IDs**, and copy the **Workbook ID.** For help with this step refer to the [Getting started with APIs](https://honeycodecommunity.aws/t/getting-started-with-honeycode-apis/790#accessing-arn-and-ids) article in Honeycode Community
 
-edit lambda/env.json
-set the workbookId to the ID of the workbook you are using
-(get the workbook id from screen)
+> *Note: If you are part of multiple teams in Honeycode, make sure to create the Workbook in the team which is linked to your AWS account*.
 
-run these commands in proejct directory
+## Deploy the accompanying code
+
+1. Create/Open a [AWS Cloud9](https://aws.amazon.com/cloud9/) IDE instance. This may take a few minutes to complete. I recommend the following configuration for this lab:
+    * Name: Honeycode API Lab
+    * Environment type: Create a new EC2 instance for environment (direct access)
+    * Instance type: t2.micro (1 GiB RAM + 1 vCPU)
+    * Platform: Amazon Linux 2 (recommended)
+    * Cost-saving setting: After 30 minutes (default)
+> Note: If you’d like to use your own machine for deploying the API application, you can do so by following the instructions to [install and configure AWS CDK](https://docs.aws.amazon.com/cdk/latest/guide/getting_started.html#getting_started_prerequisites)
+2. Download the source package by running the following commands on the Cloud9 terminal
+```
+git clone https://github.com/aws-samples/amazon-honeycode-connect-integration-sample.git
+cd amazon-honeycode-connect-integration-sample
+```
+> Note: Open **bin/honeycode_connect_lab.js** to view the name of the stack and rename the stack from **HoneycodeConnectLabStack** to say **JohnHoneycodeConnectLab** by adding your first name so it is easier to identify the resources that you create
+3. Open **lambda/env.json and update the **workbookId** with the value copied from your *Connect Manager* Honeycode app
+    * **lambda/env.json**
+4. Run the following commands to start the deployment. This will take a few minutes to complete.
+```
 npm install -gf aws-cdk
 npm install
-
-cd lambda/SavePromptsToDynamoDB
-npm install csv-stringify
-npm install 
-
-
-cd ../..
-
 cdk bootstrap
 cdk deploy
+```
+> Note: Running cdk deploy will do the following
+>    * Create the DynamoDB table, and S3 buckets
+>    * Create the Lambda functions
+>    * Create the event source (DynamoDB, S3 or Event Timer) for the Lambda functions
+>    * Add permissions for the Lambda to access Honeycode
+>    * Initialize the content in DynamoDB table, S3 bucket
 
+## Deploy an Amazon Connect flow
 
-
-
-
-## 3. Deploy an Amazon Connect flow 
-
-Step 1: Create an Amazon Connect instance 
-
-Step 2: Grant Amazon Connect permission to execute your AWS Lambda function
+1. Create an Amazon Connect instance
+2. Grant Amazon Connect permission to execute your AWS Lambda function
 Ensure that the Amazon Connect instance has permissions to access this newly created AWS Lambda Function by following these steps.
 
 Select Amazon Connect in the AWS Management Console.
@@ -72,46 +79,42 @@ On the Function drop-down menu, select the mlflows-MessageRetrieverLambda functi
 
 HoneycodeConnectLabStack-ConnectPullPromptsFromDyn-[IDENTIFIER]
 
-Step 3: Instantiate the new flow
+3. Instantiate the new flow
 (via import method, from data directory in repo)
-log into the conecte console:
+log into the Connect console:
 https://[INSTANCEID].awsapps.com/connect/home
 
 Go to contact flows
 Click create contact flow
-Import Flow (in the top right 
+Import Flow (in the top right
 
-Save flow 
-Check that the correct function is being invoked 
+Save flow
+Check that the correct function is being invoked
 Check that inMessageGroup is set to: GreetingLanguage
 
-Save flow 
+Save flow
 
 
-Step 4: add a phone number and associate it with this flow 
+4. add a phone number and associate it with this flow
 
+## Try it out
 
+### Test as Susan, the night shift supervisor
 
+### Test as Call Center Manager
 
+### Test as the Customer Support Director
 
+## (Optional) Second Region
 
-## 4. Destroy the lab
-
-cdk destroy
-
-
-# Try it out
-
-## 5. Test as Susan, the night shift suppervisor
-
-## 6. Test as Call Center Manager 
-
-## 7. Test as the Customer Support Director
-
-## 8. (Optional) Second Region
-
-Amazon Honeycode currently runs in US-WEST-2, but if your Amazon Connect is in a 
-different region. You can still use this solution with DynamoDB Global Tables and 
+Amazon Honeycode currently runs in US-WEST-2, but if your Amazon Connect is in a
+different region. You can still use this solution with DynamoDB Global Tables and
 replicate the data to a table in the region where your Amazon Connect runs.
 
+## Cleanup
 
+1. Remove the Serverless API application by running the following command in your Cloud9 IDE
+```
+cdk destroy
+```
+2. Delete the Cloud9 IDE by opening the [Cloud9 console](https://us-west-2.console.aws.amazon.com/cloud9/home?region=us-west-2) and clicking on Delete
