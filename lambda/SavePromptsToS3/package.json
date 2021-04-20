@@ -13,6 +13,6 @@
     "csv-stringify": "^5.6.1"
   },
   "repository": {
-    "url": "https://github.com/aws-samples/tbd"
+    "url": "https://github.com/aws-samples/amazon-honeycode-connect-integration-sample"
   }
 }
