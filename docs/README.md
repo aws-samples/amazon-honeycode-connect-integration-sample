@@ -69,13 +69,15 @@ cdk deploy
 ## Deploy an Amazon Connect flow
 
 1. Create an Amazon Connect instance
+Follow the instructions here: https://ai-services.go-aws.com/40_connect-transcribe/20_connect.html (up to and including claim a phone number)
+
 2. Grant Amazon Connect permission to execute your AWS Lambda function
 Ensure that the Amazon Connect instance has permissions to access this newly created AWS Lambda Function by following these steps.
 
 Select Amazon Connect in the AWS Management Console.
 Select your Amazon Connect virtual contact center instance.
 Choose Contact flows and scroll down to the AWS Lambda section.
-On the Function drop-down menu, select the mlflows-MessageRetrieverLambda function and click on +Add Lambda Function, as shown in the following screenshot:
+On the Function drop-down menu, select the ConnectPullPromptsFromDyn function and click on +Add Lambda Function, as shown in the following screenshot:
 
 HoneycodeConnectLabStack-ConnectPullPromptsFromDyn-[IDENTIFIER]
 
