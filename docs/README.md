@@ -95,24 +95,30 @@ Your Connect console URL would look like:
 - Choose Save, Import flow.
 - Select the file to import, and choose Import. When the contact flow is imported into an existing contact flow, the name of the existing contact flow is updated, too.
   - The file to import the flow is located in this repository in the (data) folder.
-  [MultilingualFlow](data/MultilingualFlow)
+  [MultilingualFlow](../data/MultilingualFlow)
 - Review and update any resolved or unresolved references as necessary.
+  ![Amazon Connect - Fixing Lambda reference](media/Amazon-Connect-fixing-lambda-reference.gif)
 - To save the imported flow, choose Save. To publish, choose Save and Publish.
 
 
 ## Try it out
 
-- Test as Susan, the night shift supervisor
+The Honeycode workbook has three apps, one for each role: a) Shift Supervisor, b) Call Center Manager, and c) Customer Support Director. 
+You can use the Customer Support Director app to exercise all the capabilities. Please watch this video to see the app in action and of course try it out for yourself.
 
-- Test as Call Center Manager
+https://www.twitch.tv/videos/936843139?collection=SWZxnzN9aRYK9A
 
-- Test as the Customer Support Director
 
-## (Optional) Second Region
+## Optional enhancements
 
-Amazon Honeycode currently runs in US-WEST-2, but if your Amazon Connect is in a
-different region. You can still use this solution with DynamoDB Global Tables and
+### Second Region
+
+Amazon Honeycode currently runs in US-WEST-2, but if your Amazon Connect instance is in a different region you can still use this solution with DynamoDB Global Tables and
 replicate the data to a table in the region where your Amazon Connect runs.
+
+### Edit other messages in the flow
+
+
 
 ## Cleanup
 
