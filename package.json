@@ -11,16 +11,17 @@
     "postinstall": "(cd lambda/SavePromptsToDynamoDB && npm install)"
   },
   "devDependencies": {
-    "@aws-cdk/assert": "1.84.0",
+    "@aws-cdk/assert": "1.98.0",
     "@aws-cdk/aws-dynamodb": "^1.85.0",
     "@aws-cdk/aws-events-targets": "^1.85.0",
     "@aws-cdk/aws-lambda": "^1.85.0",
-    "@aws-cdk/core": "1.84.0"
-    "aws-cdk": "1.84.0",
+    "@aws-cdk/core": "1.98.0",
+    "aws-cdk": "1.98.0",
     "jest": "^26.4.2"
   },
   "dependencies": {},
   "license": "MIT",
   "repository": {
     "url": "https://github.com/aws-samples/amazon-honeycode-connect-integration-sample"
+  }
 }
