@@ -77,8 +77,9 @@ Ensure that your Amazon Connect instance has permissions to access this newly cr
 - Select Amazon Connect in the AWS Management Console.
 - Select your Amazon Connect virtual contact center instance.
 - Choose Contact flows and scroll down to the AWS Lambda section.
-- On the Function drop-down menu, select the `ConnectPullPromptsFromDyn` function and click on +Add Lambda Function, as shown in the following screenshot:
+- On the Function drop-down menu, select the `ConnectPullPromptsFromDyn` function and click on +Add Lambda Function, as shown in the following image:
 
+![Amazon Connect - Lambda](media/Amazon-Connect-Contact-flows-Lambda.gif)
 > Note: Your lambda name would look like: HoneycodeConnectLab-ConnectPullPromptsFromDyn-[IDENTIFIER] where the [IDENTIFIER] is the unique and random value that CDK assigned to the resource.
 
 3. Import a contact flow
@@ -88,22 +89,28 @@ Your Connect console URL would look like:
 )
 - On the navigation menu, choose Routing, Contact flows.
 
-  ![Amazon Connect - Flows](media/Amazon-Connect-Contact-flows.png)
+  <img src="media/Amazon-Connect-Contact-flows.jpg" width="250">
 - Do one of the following:
   - To replace an existing contact flow with the one you are importing, open the contact flow to replace.
   - Create a new contact flow of the same type as the one you are importing.
 - Choose Save, Import flow.
 - Select the file to import, and choose Import. When the contact flow is imported into an existing contact flow, the name of the existing contact flow is updated, too.
   - The file to import the flow is located in this repository in the (data) folder.
-  [MultilingualFlow](../data/MultilingualFlow)
+  [ConnectMultilingualFlows](../data/ConnectMultilingualFlows)
 - Review and update any resolved or unresolved references as necessary.
   ![Amazon Connect - Fixing Lambda reference](media/Amazon-Connect-fixing-lambda-reference.gif)
 - To save the imported flow, choose Save. To publish, choose Save and Publish.
+  ![Amazon Connect - Save and Publish](media/Amazon-Connect-Contact-flows-Save-and-Publish.gif)
+- On the navigation menu, choose Routing, Phone numbers.
 
+  <img src="media/Amazon-Connect-Change-Flow.png" width="250">
+- Select the flow we just imported as the default flow for your number.
+
+  <img src="media/Amazon-Connect-Change-Flow-Save.png" width="300">
 
 ## Try it out
 
-The Honeycode workbook has three apps, one for each role: a) Shift Supervisor, b) Call Center Manager, and c) Customer Support Director. 
+The Honeycode workbook has three apps, one for each role: a) Shift Supervisor, b) Call Center Manager, and c) Customer Support Director.
 You can use the Customer Support Director app to exercise all the capabilities. Please watch this video to see the app in action and of course try it out for yourself.
 
 https://www.twitch.tv/videos/936843139?collection=SWZxnzN9aRYK9A
@@ -127,3 +134,4 @@ replicate the data to a table in the region where your Amazon Connect runs.
 cdk destroy
 ```
 2. Delete the Cloud9 IDE by opening the [Cloud9 console](https://us-west-2.console.aws.amazon.com/cloud9/home?region=us-west-2) and clicking on Delete
+3. To get obsolete contact flows out of your way, we recommend appending zzTrash_ to their name. This will also make them easy to find should you want to reuse them in the future.
