@@ -5,18 +5,27 @@
 
 /*
  * This Lambda function is used by Amazon Connect to retrieve message groups from DynamoDB
+ * original source Milos and team, published here:
+ * https://aws.amazon.com/blogs/contact-center/build-multilingual-voice-experiences-in-amazon-connect/
+ *
+ * This lambda is called for every call to the contact flow. It retrieves a complete MessageGroup from
+ * DynamoDB and the values are used by different parts of the contact flow. It does not get called for 
+ * each string, but once for all the strings needed in the flow. You may be able to change this behavior
+ * if you wish by adding mulitiple calls in your flow, retrieving different MesssageGroup each time.
  *
  */
 
 //"use strict";
 
 const AWS = require("aws-sdk");
+
 //Set the right region context
 var awsRegion = process.env.REGION;
 if (awsRegion)
 {
   AWS.config.update({region: awsRegion});
 }
+
 //Create ddb client
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
@@ -30,6 +39,7 @@ exports.handler = (event, context, callback) =>
   //extract from Connect to Lambda event header
   var ani = event.Details.ContactData.CustomerEndpoint.Address;
   var dnis = event.Details.ContactData.SystemEndpoint.Address;
+
   //input parameters from Connect  
   var language = event.Details.Parameters.inLanguage;
   var messageGroup = event.Details.Parameters.inMessageGroup;

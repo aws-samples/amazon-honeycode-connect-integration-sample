@@ -9,6 +9,7 @@
  * and then sets the Exported column in Honeycode table to today's 
  * date using the `BatchUpdateRows` Honeycode API
  */
+
 const AWS = require('aws-sdk'); //Requires atleast VERSION 2.7x
 const HC = new AWS.Honeycode({ region: 'us-west-2' });
 const DDB = new AWS.DynamoDB();
@@ -24,14 +25,9 @@ var documentClient = new AWS.DynamoDB.DocumentClient();
 // Convert from JSON to CSV
 const stringify = require('csv-stringify/lib/sync');
 
-//Alternative stringify implementation to convert from Honeycode rows JSON array to Key:Value JSON format
-/*
-const stringify = (rows, { columns }) => JSON.stringify(rows.map(row => row.reduce((values, value, i) => {
-    values[columns[i].key] = value
-    return values
-}, {})), null, 2)
-*/
-
+// This function formats the rows retrieved below into something suitable for the
+// schema used in DynamoDB and required by the Connect Flow. It converts a flat list
+// into a hierarchy under "Static" and "Situational" groups of messages.
 function saveToDynamoDB (item)
 {
     console.log("SAVETODYNAMO " + JSON.stringify(item));
@@ -66,32 +62,10 @@ function saveToDynamoDB (item)
         else console.log(data);
     }).promise();
 
-/*
-    var params = {
-        TableName: 'dynamodbTable',
-        Item: {
-            "MsgGroup" : {"S" : rowID, "M" : { "Messages" : { "S": { "Name" : {"S": "Daniel"}}}, "S" {"Age" : {"N" : "44"}} } } }
-        }
-    };
-    
-    return DDB.putItem(params, function(err, data) {
-        if (err) {
-            console.log("Error", err);
-        } else {
-            console.log("Success", data);
-        }
-    });
-*/
-    
-    //const now = new Date();
-    //const Key = `csv/${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()}/${now.getTime()}.csv`;
-    //const Key = `csv/prompts.csv`;
-    //Use json file extension when using alternative stringify implementation to store as json data
-    //const Key = `json/${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()}/${now.getTime()}.json`
-    //return S3.putObject({ Body, Bucket: s3bucket, Key }).promise();
     
 };
 
+// Lambda entry point
 exports.handler = async () => {
     
     var o = 0;
@@ -114,113 +88,23 @@ exports.handler = async () => {
         
         console.log("TABLEIDS0: " + tableIds[promptsTranslationsTableName]);
         
+        // Get message groups
         var messageGroupsList = await getMessageGroups(tableIds);
         
+        // Loop through message groups
         for (var group of messageGroupsList) 
         {
            
-            // retrieve messages and their translations
+            // retrieve messages and their translations for this message group
             group.messages = {};
             group.messages = await getMessagesForGroup(tableIds, group.msggroup);
            
+            // call formatter and writer to DynamoDB
             saveToDynamoDB(group);
             
             o++;
-            
         }
         
-/*        
-        
-        
-        //Convert to array of column names
-        const columns = tableColumns.map(column => ({ key: column.tableColumnName }));
-        
-        // Identify the Exported column ID (assuming it is newxt to last column)
-        const exportedColumnId = tableColumns[tableColumns.length - 2].tableColumnId;
-        
-        // Filter for, and Loop through the rows where Published column is blank
-        let count = 0;
-        const today = new Date().toLocaleDateString('en-US'); //M/D/Y format
-        let nextToken;
-        
-        do {
-            
-            //Get rows that have not been published already
-            const results = await HC.queryTableRows({
-                workbookId, tableId: tableIds[promptsTableName],
-                filterFormula: {
-                    formula: `=FILTER(${promptsTableName}, "${promptsTableName}[PublishedDDB] = %","")`
-                },
-                nextToken
-            }).promise()
-            
-            //Convert json structure for writing to CSV
-            const rows = []
-            const rowsToUpdate = []
-            const colHeads = results.columnIds;
-            if (results.rows) {
-                var o = {};
-                o['Messages'] = {};
-                o['Messages']['Situational'] = [];
-                o['Messages']['Static'] = [];
-
-                // go through all rows returned
-                for (let { cells, rowId } of results.rows) {
-                    
-                    var osit = {};
-                    osit.Enabled = 'true';
-                    osit.MsgDetail = {};
-                    osit.MsgDetail.MsgId = "sampleMessageID";
-                    osit.MsgDetail.MsgText = {};
-                    
-
-                    const row = [];
-                    
-                    // go through the cells of a given row
-                    for (let { formattedValue } of cells) {
-                        osit.MsgDetail.MsgText['en-US'] = formattedValue;
-                        row.push(formattedValue)
-                    }
-                    
-                    o['Messages']['Situational'].push(osit);
-                    o['Messages']['Static'].push(osit);
-                    o['MsgGroup'] = "daniels-sample-messages";
-                    
-                    console.log("ROWSTRING: " + JSON.stringify(o));
-                    
-                    await saveToDynamoDB(o);
-                    
-                    //Update exported date, assuming this is the last column in the table
-                    
-                    row.splice(row.length - 2, 1, today)
-                    rows.push(row)
-                    rowsToUpdate.push({
-                        rowId,
-                        cellsToUpdate: {
-                            [exportedColumnId]: {
-                                fact: today
-                            }
-                        }
-                    })
-                    
-                }
-            }
-            if (rows.length > 0) {
-                //Write to S3
-                // await saveToS3(stringify(rows, { header: true, columns }))
-                //Update exported date in table
-                const { failedBatchItems } = await HC.batchUpdateTableRows({
-                    workbookId, tableId: tableIds[promptsTableName], rowsToUpdate
-                }).promise()
-                if (failedBatchItems) {
-                    console.error('Failed to update export date', JSON.stringify(failedBatchItems, null, 2))
-                }
-                count += rows.length;
-            }
-            nextToken = results.nextToken;
-        } while (nextToken);
-        */
-
         let result;
         if (o) {
             result = `Exported ${o} row(s) of prompts`;
@@ -235,12 +119,14 @@ exports.handler = async () => {
     }
 };
 
-// 
-// getMessageGroups - returns MsgGroups that are approved (ie. Approved != "") 
-//
-// Return: array of {MsgGroupId,MsgGroup} column (aka: Group Name) 
-// Param: - none, reads from MessageGroups table
-//
+/*
+ *
+ * getMessageGroups - returns MsgGroups that are Live
+ *
+ * Param: - none, reads from MessageGroups table
+ * Return: array of {MsgGroupId,MsgGroup} column (aka: Group Name) 
+ *
+ */
 var getMessageGroups = async (tableIds) => {
     
     console.log("TABLEIDS1: " + tableIds[promptsGroupsTableName]);
@@ -251,7 +137,7 @@ var getMessageGroups = async (tableIds) => {
         let nextToken;
         do {
         
-            //Get rows that have not been published already
+            // Get MessageGroup rows that are marked as Live in Honeycode
             const results = await HC.queryTableRows(
                 { workbookId, 
                   tableId: tableIds[promptsGroupsTableName],
@@ -261,7 +147,7 @@ var getMessageGroups = async (tableIds) => {
                   nextToken
             }).promise()
             
-            //Convert json structure for writing to CSV
+            // Convert json structure into a record we will later process and save to Dynamo
             if (results.rows) {
                 
                // go through all rows returned
@@ -277,6 +163,7 @@ var getMessageGroups = async (tableIds) => {
             }
             
             nextToken = results.nextToken;
+
         } while (nextToken);
         
         return o;
@@ -289,14 +176,22 @@ var getMessageGroups = async (tableIds) => {
 };
 
 
-//
-//
-//
-//
+/*
+ *
+ * getMessagesForGroup - retrieves the messages for this specific group
+ *   also makes a call to retrieve the translations for each messageId in this message group.
+ *
+ * Params 
+ *   - tableId = name of the table
+ *   - groupId = name of messageGroup for which to find messages
+ * Return
+ *   - a complete flat (one message id per entry) array of messages with their translations as children
+ *         for example [ ...{"EmergencyMessage":{messageId:EmergencyMessage,translations:{}...
+ */
 var getMessagesForGroup = async (tableIds,groupId) => 
 {
 
-    console.log("TABLEIDS2: GROUP " + tableIds[promptsTableName] + " group " + groupId);
+   console.log("TABLEIDS2: GROUP " + tableIds[promptsTableName] + " group " + groupId);
 
    try {
         
@@ -326,19 +221,19 @@ var getMessagesForGroup = async (tableIds,groupId) =>
                     var curColNumber = 0;
                     var row = {};
                     
-                /*
-                 * Go through every cell and save it
-                 * column/cell number - mapped to column name 
-                 *
-                    0 - MessageId
-                    1 - Description
-                    2 - GroupId
-                    3 - TypePicklist
-                    4 - Type
-                    5 - ReferenceId
-                    6 - ValidStart
-                    7 - ValidEnd
-                */
+                   /*
+                    * Go through every cell and save it
+                    * column/cell number - mapped to column name 
+                    *
+                    *  0 - MessageId
+                    *  1 - Description
+                    *  2 - GroupId
+                    *  3 - TypePicklist
+                    *  4 - Type
+                    *  5 - ReferenceId
+                    *  6 - ValidStart
+                    *  7 - ValidEnd
+                    */
                     
                     for (let { formattedValue } of cells) {
                         switch (curColNumber) {
@@ -374,6 +269,17 @@ var getMessagesForGroup = async (tableIds,groupId) =>
     
 };
 
+/*
+ *
+ * getTranslationsForMessage - returns the specific translations for a given MessageID
+ *
+ * Params:
+ *  - tableId - the table name to search for translations in; example "MessageTranslations"
+ *  - messageId - the ID of the message for which we get translations; example: "EmergencyMessage"
+ * Returns:
+ *  - a json that stores locale and string for that locale; example {"en-US":"Due to earthquakes...","en-ES":"Para.."}
+ *    these will be added to the messageId above and later be formatted and saved in DynamoDB
+ */
 var getTranslationsForMessage = async (tableIds,messageId) =>
 {
 
@@ -398,12 +304,10 @@ var getTranslationsForMessage = async (tableIds,messageId) =>
             
             console.log("RESULTS3: " + results.rows.length);
             
-            //Convert results into json [ {message {translations}}, ....]
+            //Convert results into json {locale: translation, locale: translation, ....}
             if (results.rows) {
                 
-                // go through all Messages rows returned (see Messages table)
-                //for (let { cells, rowId } of results.rows) {
-                //for (let i = 0 ; i < results.rows.length; i++) {
+                // go through all translations rows returned (see Messages table)
                 results.rows.forEach(r => 
                 {
                     var cells = r.cells;
@@ -412,14 +316,14 @@ var getTranslationsForMessage = async (tableIds,messageId) =>
                     var curColNumber = 0;
                     var row = {};
                     
-                /*
-                 * Go through every cell and save it
-                 * column/cell number - mapped to column name 
-                 *
-                    0 - MessageId
-                    1 - Text
-                    2 - Locale
-                */
+                   /*
+                    * Go through every cell and save it
+                    * column/cell number - mapped to column name 
+                    *
+                    *   0 - MessageId
+                    *   1 - Text
+                    *   2 - Locale
+                    */
                     
                     // for (let { formattedValue } of cells) {
                     cells.forEach(c => 
@@ -430,6 +334,8 @@ var getTranslationsForMessage = async (tableIds,messageId) =>
                         }
                         curColNumber++;
                     });
+
+                    // associate locale with text
                     o[row.locale] = row.text; 
                 });
             }
