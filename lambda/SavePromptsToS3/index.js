@@ -4,6 +4,12 @@
  */
 
 /**
+ *
+ * This lambda is not needed/used it is only left here to show how to save to a table to S3. If you want to use
+ * this create a table in Honeycode with a number of columns, name it as you see in env.json file and this willl
+ * start to save the records in a CSV file in S3. The last column of the table should be Exported, and formatted as
+ * date time.
+ *
  * This lambda uses the `QueryTableRows` Honeycode APs to read contact history and saves them to an S3 bucket 
  * and then sets the Exported column in Honeycode table to today's date using the `BatchUpdateRows` Honeycode API
  */
@@ -17,14 +23,6 @@ const { workbookId, faqTableName, s3bucket } = process.env;
 
 // Convert from JSON to CSV
 const stringify = require('csv-stringify/lib/sync');
-
-//Alternative stringify implementation to convert from Honeycode rows JSON array to Key:Value JSON format
-/*
-const stringify = (rows, { columns }) => JSON.stringify(rows.map(row => row.reduce((values, value, i) => {
-    values[columns[i].key] = value
-    return values
-}, {})), null, 2)
-*/
 
 const saveToS3 = Body => {
     //const now = new Date();
