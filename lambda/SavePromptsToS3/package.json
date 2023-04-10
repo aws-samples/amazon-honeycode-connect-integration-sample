@@ -9,7 +9,7 @@
   "author": "dtet@amazon.com",
   "license": "MIT",
   "dependencies": {
-    "aws-sdk": "^2.828.0",
+    "aws-sdk": "^2.1354.0",
     "csv-stringify": "^5.6.1"
   },
   "repository": {
